@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>YolarGames.GameStateService</id>
+    <version>0.0.1</version>
+    <description>Simple solution for project that has one GameState (puzzles,)</description>
+    <authors>YolarGames</authors>
+    <title>Single GameState Service</title>
+    <owners>YolarGames</owners>
+    <licenseUrl>https://github.com/YolarGames/Privacy-Policy/blob/main/LICENSE</licenseUrl>
+    <projectUrl>http://your_project_url_here</projectUrl>
+    <iconUrl>https://www.nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
+    <releaseNotes>initial release</releaseNotes>
+    <copyright>Copyright 2024</copyright>
+    <tags>Unity C# GameState Service</tags>
+    <dependencies />
+  </metadata>
+</package>
