@@ -6,14 +6,26 @@ namespace Examples
 {
 	public class MoveSystem : ITickSystem
 	{
-		public void Tick(in float deltaTime)
+		private const string UpdateLogMessage = "MoveSystem.Tick()";
+		private EcsFilter<Position, Velocity> _filter;
+
+		public void Tick(float deltaTime)
 		{
-			Debug.Log($"MoveSystem: {deltaTime}");
+			float delta = Time.deltaTime;
+			for (var i = 0; i < _filter.EntityCount; i++) { }
 		}
 
-		public void CreateFilter(EcsWorld world)
-		{
-			Debug.Log("CreateFilter for MoveSystem");
-		}
+		public void CreateFilter(EcsWorld world) =>
+			_filter = new EcsFilter<Position, Velocity>(world);
+	}
+
+	public struct Position : IComponent
+	{
+		public Vector2 Value;
+	}
+
+	public struct Velocity : IComponent
+	{
+		public float Value;
 	}
 }

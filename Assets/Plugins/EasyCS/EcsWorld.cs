@@ -5,18 +5,17 @@ using EasyCS.Utilities;
 namespace EasyCS
 {
 	public class EcsWorld
-
 	{
 		private const int EmptyEntity = -1;
 		private readonly EntityIdProvider _entityIdProvider;
 		private readonly EntityList<int> _entities;
-		private readonly SystemsRunner _systemsRunner;
+		public SystemsRunner SystemsRunner { get; }
 
 		public EcsWorld(int entityCount = 1000)
 		{
 			_entityIdProvider = new EntityIdProvider();
 			_entities = new EntityList<int>(entityCount);
-			_systemsRunner = new SystemsRunner(this);
+			SystemsRunner = new SystemsRunner(this);
 			_entities.PopulateWith(EmptyEntity);
 		}
 
@@ -38,7 +37,7 @@ namespace EasyCS
 		}
 
 		public void RegisterSystem<T>() where T : class, ISystem, new() =>
-			_systemsRunner.Register<T>();
+			SystemsRunner.Register<T>();
 
 		private class EntityIdProvider
 		{
