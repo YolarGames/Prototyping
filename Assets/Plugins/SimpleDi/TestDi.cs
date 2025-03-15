@@ -9,9 +9,9 @@ namespace SimpleDi
 			var container = new DiContainer();
 			var resolver = new DiResolver(container);
 
-			container.Register<MessagePublisher>();
-			container.Register<PublishInvokator>();
-			container.Register<MessageService>();
+			container.Register<MessagePublisher>(Lifetime.Transient);
+			container.Register<PublishInvokator>(Lifetime.Transient);
+			container.Register<MessageService>(Lifetime.Singleton);
 
 			var hello1 = resolver.GetService<PublishInvokator>();
 			var hello2 = resolver.GetService<PublishInvokator>();
