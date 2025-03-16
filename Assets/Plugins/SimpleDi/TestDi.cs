@@ -9,13 +9,15 @@ namespace SimpleDi
 			var container = new DiContainer();
 			var resolver = new DiResolver(container);
 
-			container.Register<MessagePublisher>(Lifetime.Transient);
-			container.Register<PublishInvokator>(Lifetime.Transient);
-			container.Register<MessageService>(Lifetime.Singleton);
+			container.Register<MessageProvider>(Lifetime.Transient).As<IMessageProvider>();
+			container.Register<MessagePublisher>(Lifetime.Transient).AsSelf();
+			container.Register<PublishInvokator>(Lifetime.Transient).AsSelf();
+			container.Build();
 
 			var hello1 = resolver.GetService<PublishInvokator>();
 			var hello2 = resolver.GetService<PublishInvokator>();
 			var hello3 = resolver.GetService<PublishInvokator>();
+
 			hello1.Publish();
 			hello2.Publish();
 			hello3.Publish();
@@ -24,16 +26,16 @@ namespace SimpleDi
 
 	public class MessagePublisher
 	{
-		private readonly MessageService _messageService;
+		private readonly IMessageProvider _messageProvider;
 
-		public MessagePublisher(MessageService messageService)
+		public MessagePublisher(IMessageProvider messageProvider)
 		{
-			_messageService = messageService;
+			_messageProvider = messageProvider;
 		}
 
 		public void PrintHello()
 		{
-			Debug.Log(_messageService.GetMessage());
+			Debug.Log(_messageProvider.GetMessage());
 		}
 	}
 
@@ -52,11 +54,16 @@ namespace SimpleDi
 		}
 	}
 
-	public class MessageService
+	public interface IMessageProvider
+	{
+		string GetMessage();
+	}
+
+	public class MessageProvider : IMessageProvider
 	{
 		private readonly int _randomNumber;
 
-		public MessageService() =>
+		public MessageProvider() =>
 			_randomNumber = Random.Range(0, 1000);
 
 		public string GetMessage() =>

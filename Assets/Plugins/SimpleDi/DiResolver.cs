@@ -8,52 +8,56 @@ namespace SimpleDi
 	public class DiResolver
 	{
 		private readonly DiContainer _container;
+		private readonly Dictionary<Type, Dependency[]> _resolvedScoped = new();
 		private readonly Dictionary<Type, Dependency> _resolvedSingletons = new();
-		private readonly Dictionary<Type, object[]> _resolvedScoped = new();
 
 		public DiResolver(DiContainer container) =>
 			_container = container;
 
-		public T GetService<T>()
-		{
-			return (T)GetService(_container.GetDependency<T>().ImplementationType);
-		}
+		public T GetService<T>() =>
+			(T)GetService(_container.GetDependency<T>().DependencyType);
 
 		private object GetService(Type type)
 		{
 			Dependency dependency = _container.GetDependency(type);
-			Type implementationType = dependency.ImplementationType;
+			Type dependencyType = dependency.DependencyType;
 
-			if (dependency.Lifetime == Lifetime.Singleton
-			    && _resolvedSingletons.TryGetValue(implementationType, out Dependency value))
-				return value.Implementation;
+			if (IsResolvedAsSingleton(dependency, dependencyType))
+				return dependency.Implementation;
 
-			ConstructorInfo[] constructors = implementationType.GetConstructors();
+			ConstructorInfo[] constructors = dependencyType.GetConstructors();
 
 			if (CanFastResolve(constructors))
-			{
-				dependency.Implementation = Activator.CreateInstance(implementationType);
+				return CreateInstance(dependency);
 
-				if (dependency.Lifetime == Lifetime.Singleton)
-					_resolvedSingletons.Add(implementationType, dependency);
+			AssertHasOneConstructor(dependencyType, constructors);
 
-				return dependency.Implementation;
-			}
+			return CreateInstance(dependency, ResolveParameters(constructors));
+		}
 
-			Debug.Assert(constructors.Length == 1, $"Type {implementationType.Name} has more than one constructor\n");
+		private static void AssertHasOneConstructor(Type type, ConstructorInfo[] constructors) =>
+			Debug.Assert(constructors.Length == 1, $"Type {type.Name} has more than one constructor\n");
 
+		private bool IsResolvedAsSingleton(Dependency dependencyBuilder, Type implementationType) =>
+			dependencyBuilder.Lifetime.IsSingleton() && _resolvedSingletons.ContainsKey(implementationType);
+
+		private object[] ResolveParameters(ConstructorInfo[] constructors)
+		{
 			ConstructorInfo constructor = constructors[0];
 			ParameterInfo[] parameters = constructor.GetParameters();
 			var resolvedParameters = new object[parameters.Length];
 
 			for (var i = 0; i < parameters.Length; i++)
 				resolvedParameters[i] = GetService(parameters[i].ParameterType);
+			return resolvedParameters;
+		}
 
-
-			dependency.Implementation = Activator.CreateInstance(implementationType, resolvedParameters);
+		private object CreateInstance(Dependency dependency, params object[] parameters)
+		{
+			dependency.Implementation = Activator.CreateInstance(dependency.DependencyType, parameters);
 
 			if (dependency.Lifetime == Lifetime.Singleton)
-				_resolvedSingletons.Add(implementationType, dependency);
+				_resolvedSingletons.Add(dependency.DependencyType, dependency);
 
 			return dependency.Implementation;
 		}
