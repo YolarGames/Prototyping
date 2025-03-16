@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SimpleDi
 {
-	public class DiContainer
+	public class DiContainer : IContainerBuilder
 	{
 		private readonly Dictionary<Type, Dependency> _dependencies = new();
 		private readonly Dictionary<Type, DependencyBuilder> _builders = new();
@@ -22,9 +22,11 @@ namespace SimpleDi
 			return default;
 		}
 
-		public DependencyBuilder Register<T>(Lifetime lifetime)
+		public DependencyBuilder Register<T>(Lifetime lifetime) =>
+			Register(typeof(T), lifetime);
+
+		public DependencyBuilder Register(Type type, Lifetime lifetime)
 		{
-			Type type = typeof(T);
 			Debug.Assert(!_builders.ContainsKey(type), $"Dependency {type.Name} already registered\n");
 
 			_builders.TryAdd(type, new DependencyBuilder(type, lifetime));
@@ -39,5 +41,16 @@ namespace SimpleDi
 			foreach (Type assignableType in dependency.AssignableTypes)
 				_dependencies.Add(assignableType, dependency);
 		}
+	}
+
+	public interface IContainerBuilder
+	{
+		Dependency GetDependency<T>();
+
+		Dependency GetDependency(Type type);
+
+		DependencyBuilder Register<T>(Lifetime lifetime);
+
+		DependencyBuilder Register(Type type, Lifetime lifetime);
 	}
 }

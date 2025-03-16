@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SimpleDi
 {
 	public class TestDi : MonoBehaviour
 	{
+		[Inject]
 		private void Awake()
 		{
 			var container = new DiContainer();
@@ -22,6 +24,9 @@ namespace SimpleDi
 			hello2.Publish();
 			hello3.Publish();
 		}
+
+		private int[] CreateArray() =>
+			new[] { 1, 2, 3 };
 	}
 
 	public class MessagePublisher
