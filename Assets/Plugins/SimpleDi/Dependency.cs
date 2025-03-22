@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SimpleDi
 {
-	public class Dependency
+	public struct Dependency
 	{
 		public readonly IReadOnlyCollection<Type> AssignableTypes;
 		public readonly Lifetime Lifetime;

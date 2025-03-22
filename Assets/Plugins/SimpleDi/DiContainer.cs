@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SimpleDi.Builders;
 using UnityEngine;
 
 namespace SimpleDi
 {
-	public class DiContainer : IContainerBuilder
+	public sealed class DiContainer : IContainerBuilder
 	{
 		private readonly Dictionary<Type, Dependency> _dependencies = new();
 		private readonly Dictionary<Type, DependencyBuilder> _builders = new();
@@ -33,6 +34,13 @@ namespace SimpleDi
 			return _builders[type];
 		}
 
+		public DependencyBuilder RegisterInstance<TInstance>(TInstance instance)
+		{
+			var builder = new InstanceDependencyBuilder(instance, typeof(TInstance), Lifetime.Singleton);
+
+			return builder;
+		}
+
 		public void Build()
 		{
 			IEnumerable<Dependency> dependencies = _builders.Values.Select(builder => builder.Build());
@@ -52,5 +60,7 @@ namespace SimpleDi
 		DependencyBuilder Register<T>(Lifetime lifetime);
 
 		DependencyBuilder Register(Type type, Lifetime lifetime);
+
+		DependencyBuilder RegisterInstance<TInstance>(TInstance instance);
 	}
 }
