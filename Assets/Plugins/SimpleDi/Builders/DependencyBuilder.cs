@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SimpleDi
+namespace SimpleDi.Builders
 {
 	public class DependencyBuilder
 	{
@@ -74,7 +74,7 @@ namespace SimpleDi
 			return this;
 		}
 
-		public Dependency Build()
+		public virtual Dependency Build()
 		{
 			Debug.Assert(_assignableTypes.Count != 0,
 				$"The assignable types aren't registered for {_dependencyType.Name}. " +
