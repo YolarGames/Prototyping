@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace SimpleDi
 {
-	public class DiResolver
+	public sealed class DiResolver : IObjectResolver
 	{
-		private readonly DiContainer _container;
 		private readonly Dictionary<Type, Dependency[]> _resolvedScoped = new();
 		private readonly Dictionary<Type, Dependency> _resolvedSingletons = new();
+		private readonly IContainerBuilder _container;
 
-		public DiResolver(DiContainer container) =>
+		public DiResolver(IContainerBuilder container) =>
 			_container = container;
 
 		public T GetService<T>() =>
@@ -22,8 +22,14 @@ namespace SimpleDi
 			Dependency dependency = _container.GetDependency(type);
 			Type dependencyType = dependency.DependencyType;
 
-			if (IsResolvedAsSingleton(dependency, dependencyType))
+			if (_resolvedSingletons.ContainsKey(dependencyType))
 				return dependency.Implementation;
+
+			if (dependency.Implementation != null)
+			{
+				_resolvedSingletons.Add(dependency.DependencyType, dependency);
+				return dependency.Implementation;
+			}
 
 			ConstructorInfo[] constructors = dependencyType.GetConstructors();
 
@@ -37,9 +43,6 @@ namespace SimpleDi
 
 		private static void AssertHasOneConstructor(Type type, ConstructorInfo[] constructors) =>
 			Debug.Assert(constructors.Length == 1, $"Type {type.Name} has more than one constructor\n");
-
-		private bool IsResolvedAsSingleton(Dependency dependencyBuilder, Type implementationType) =>
-			dependencyBuilder.Lifetime.IsSingleton() && _resolvedSingletons.ContainsKey(implementationType);
 
 		private object[] ResolveParameters(ConstructorInfo[] constructors)
 		{
