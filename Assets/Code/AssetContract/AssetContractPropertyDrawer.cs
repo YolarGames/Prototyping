@@ -13,7 +13,6 @@ namespace AssetContract
 			Object asset = property.objectReferenceValue;
 			var contract = (AssetContractAttribute)attribute;
 
-
 			if (!asset)
 			{
 				EditorGUI.ObjectField(position, property, label);

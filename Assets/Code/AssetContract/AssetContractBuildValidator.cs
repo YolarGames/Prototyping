@@ -12,7 +12,7 @@ namespace AssetContract
 	{
 		public int callbackOrder => 0;
 
-		public void OnPreprocessBuild(BuildReport report)
+		public void OnPreprocessBuild(BuildReport _)
 		{
 			var violations = new List<string>();
 
@@ -39,23 +39,39 @@ namespace AssetContract
 				.GetType()
 				.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
+			string objectProjectPath = GetTargetObjectProjectPath(target);
+
 			foreach (FieldInfo field in fields)
 			{
 				object[] attrs = field.GetCustomAttributes(typeof(AssetContractAttribute), true);
 				if (attrs.Length == 0)
 					continue;
 
-				var contract = (AssetContractAttribute)attrs[0];
-				if (!contract.IsSupportedFieldType(field.FieldType))
-					continue;
-
 				var asset = field.GetValue(target) as Object;
 				if (!asset)
-					continue;
+					violations.Add($"{objectProjectPath}.{field.Name}: Maybe you forgot to assign this field?");
 
-				if (!contract.IsValid(asset, out string error))
-					violations.Add($"{target.name}.{field.Name}: {error}");
+				var contract = (AssetContractAttribute)attrs[0];
+				if (!contract.IsSupportedFieldType(field.FieldType, out string error))
+					violations.Add($"{objectProjectPath}.{field.Name}: {error}");
+
+				if (!contract.IsValid(asset, out error))
+					violations.Add($"{objectProjectPath}.{field.Name}: {error}");
 			}
+		}
+
+		private static string GetTargetObjectProjectPath(Object obj)
+		{
+			if (obj is not MonoBehaviour monoBehaviour)
+				return obj.name;
+
+			if (PrefabUtility.IsPartOfPrefabAsset(monoBehaviour))
+				return monoBehaviour.gameObject.name;
+
+			if (monoBehaviour.gameObject.scene.IsValid())
+				return $"{monoBehaviour.gameObject.scene.name}.{monoBehaviour.gameObject.name}";
+
+			return obj.name;
 		}
 
 		private static T[] LoadAllAssets<T>() where T : Object

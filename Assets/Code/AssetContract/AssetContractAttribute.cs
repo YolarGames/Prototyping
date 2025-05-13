@@ -8,6 +8,7 @@ namespace AssetContract
 	public abstract class AssetContractAttribute : PropertyAttribute
 	{
 		public abstract bool IsValid(Object asset, out string error);
-		public abstract bool IsSupportedFieldType(Type fieldType);
+
+		public abstract bool IsSupportedFieldType(Type fieldType, out string error);
 	}
 }

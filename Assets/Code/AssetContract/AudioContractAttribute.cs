@@ -19,9 +19,6 @@ namespace AssetContract
 		{
 			error = null;
 
-			if (!asset)
-				return false;
-
 			if (!IsValidExtension(asset))
 				error += $"Texture must be in {Extension} format. ";
 
@@ -31,8 +28,11 @@ namespace AssetContract
 			return error == null;
 		}
 
-		public override bool IsSupportedFieldType(Type fieldType) =>
-			fieldType == typeof(AudioClip);
+		public override bool IsSupportedFieldType(Type fieldType, out string error)
+		{
+			error = $"Asset type {fieldType.Name} is not supported target of attribute {GetType().Name}.";
+			return fieldType == typeof(AudioClip);
+		}
 
 		private bool IsValidFileSize(Object asset) =>
 			MaxFileSizeKb == 0 || asset.GetFileSizeKb() <= MaxFileSizeKb;

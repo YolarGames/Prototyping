@@ -31,8 +31,7 @@ namespace AssetContract
 			{
 				Sprite sprite => sprite.texture,
 				Texture2D texture2D => texture2D,
-				_ => throw new NotSupportedException(
-					$"Asset type {asset.GetType().Name} is not supported target of attribute {GetType().Name}"),
+				_ => null,
 			};
 
 			if (!texture)
@@ -50,9 +49,12 @@ namespace AssetContract
 			return error == null;
 		}
 
-		public override bool IsSupportedFieldType(Type fieldType) =>
-			fieldType == typeof(Texture2D)
-			|| fieldType == typeof(Sprite);
+		public override bool IsSupportedFieldType(Type fieldType, out string error)
+		{
+			error = $"Asset type {fieldType.Name} is not supported target of attribute {GetType().Name}.";
+			return fieldType == typeof(Texture2D)
+			       || fieldType == typeof(Sprite);
+		}
 
 		private bool IsCorrectResolution(Texture2D texture) =>
 			Resolution is { x: <= 0, y: <= 0 }
