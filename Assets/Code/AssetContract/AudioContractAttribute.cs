@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace AssetContract
 {
-	public sealed class AudioContractAttribute : AssetContractAttribute
+	public sealed class AudioContractAttribute : AssetContractAttributeBase
 	{
 		private int MaxFileSizeKb { get; }
 		private string Extension { get; }

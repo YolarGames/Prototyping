@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AssetContract
 {
-	[CustomPropertyDrawer(typeof(AssetContractAttribute), true)]
+	[CustomPropertyDrawer(typeof(AssetContractAttributeBase), true)]
 	public class AssetContractPropertyDrawer : PropertyDrawer
 	{
 		private bool _hasError;
@@ -11,7 +11,7 @@ namespace AssetContract
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			Object asset = property.objectReferenceValue;
-			var contract = (AssetContractAttribute)attribute;
+			var contract = (AssetContractAttributeBase)attribute;
 
 			if (!asset)
 			{

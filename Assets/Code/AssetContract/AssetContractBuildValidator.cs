@@ -43,7 +43,7 @@ namespace AssetContract
 
 			foreach (FieldInfo field in fields)
 			{
-				object[] attrs = field.GetCustomAttributes(typeof(AssetContractAttribute), true);
+				object[] attrs = field.GetCustomAttributes(typeof(AssetContractAttributeBase), true);
 				if (attrs.Length == 0)
 					continue;
 
@@ -51,7 +51,7 @@ namespace AssetContract
 				if (!asset)
 					violations.Add($"{objectProjectPath}.{field.Name}: Maybe you forgot to assign this field?");
 
-				var contract = (AssetContractAttribute)attrs[0];
+				var contract = (AssetContractAttributeBase)attrs[0];
 				if (!contract.IsSupportedFieldType(field.FieldType, out string error))
 					violations.Add($"{objectProjectPath}.{field.Name}: {error}");
 

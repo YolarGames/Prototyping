@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace AssetContract
 {
-	public sealed class TextureContractAttribute : AssetContractAttribute
+	public sealed class TextureContractAttribute : AssetContractAttributeBase
 	{
 		private int MaxFileSizeKb { get; }
 		private string Extension { get; }
